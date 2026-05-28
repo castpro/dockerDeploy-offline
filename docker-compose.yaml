@@ -1,0 +1,134 @@
+services:
+  # MySQL 서비스 (db)
+  db:
+    build: . # 현재 디렉ㅌ초리의 Dockerfile을 사용하여 빌드
+    image: offline-db
+    container_name: offline-db-container
+    restart: always  # 컨테이너가 종료되면 자동 재시작\
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      # MYSQL_DATABASE: my_database
+      # MYSQL_USER: my_user
+      # MYSQL_PASSWORD: my_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_v:/var/lib/mysql  # 컨테이너 종료시 데이터 유지
+      # - ./db/sql:/docker-entrypoint-initdb.d  # SQL 파일을 MySQL 초기화에 사용
+    networks:
+      - app-network
+
+
+  # evc_was 서비스
+  evc_was:
+    build: ../evc_was/
+    image: offline-evc_was  # evc_was.tar 파일로 로드한 이미지 이름
+    container_name: offline-evc_was-container
+    restart: always  # 컨테이너가 종료되면 자동 재시작\
+    ports:
+      - "3002:3002"
+      - "3003:3003"
+    volumes:
+      - evc_was_v:/app/dist
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - ERROR_SERVER_URL=evc_errorreporter:4001
+      - HTTP_PORT=3002
+      - HTTPS_PORT=3003
+      # HDC 현대산업개발 단지서버 연동 설정
+      # HDC 단지망이 없는 현장: HDC_ENABLED=false (기본값)
+      # HDC 단지망이 있는 현장: HDC_ENABLED=true 로 변경 후 HDC_SERVER_URL 설정
+      - HDC_ENABLED=true
+      - HDC_SERVER_URL=http://192.168.0.100:8080
+    networks:
+      - app-network
+    command: ["node","dist/bundle.js"]
+
+  # ocpp 서비스
+  ocpp:
+    build: ../ocpp/
+    image: offline-ocpp  # ocpp.tar 파일로 로드한 이미지 이름
+    container_name: offline-ocpp-container
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BACKEND_WAS_HOST=http://evc_was:3002
+    restart: always  # 컨테이너가 종료되면 자동 재시작\
+    ports:
+      - "3000:3000"
+    volumes:
+      - ocpp_v:/app/dist
+    networks:
+      - app-network
+    command: ["node","dist/bundle.js"]
+
+  # evc_webadmin 서비스
+  evc_webadmin:
+    build:
+      context: ../evc_webadmin
+      dockerfile: Dockerfile.offline.prod
+      args:
+        - REACT_APP_HOSTNAME=http://localhost:3002
+        - REACT_APP_HOSTNAME_SOCKET=http://localhost:3000
+        - REACT_APP_OCPP_HOSTNAME=http://localhost:3004
+        - REACT_APP_ERROR_BACKEND=http://localhost:4001
+        - PORT=80
+        - REACT_APP_INFRA=docker
+        - REACT_APP_NETWORK=offline
+    image: offline-evc_webadmin  # evc_webadmin.tar 파일로 로드한 이미지 이름
+    container_name: offline-evc_webadmin-container
+    restart: always  # 컨테이너가 종료되면 자동 재시작\
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+
+  redis:
+    image: redis:latest
+    command: ["redis-server", "--bind", "0.0.0.0"]
+    restart: always  # 컨테이너가 종료되면 자동 재시작\
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  # evc_errorrepoter 서비스
+  evc_errorreporter:
+    build: ../evc_errorreporter
+    image: offline-evc_errorreporter  # evc_webadmin.tar 파일로 로드한 이미지 이름
+    container_name: offline-evc_errorreporter-container
+    restart: always  # 컨테이너가 종료되면 자동 재시작\
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - APP_PORT=4001
+    ports:
+      - "4001:4001"
+    networks:
+      - app-network
+    command: ["node","dist/index.js"]
+
+
+# # 네트워크 설정
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_v: # db 볼륨 선언
+  evc_was_v: # evc_was 볼륨 선언
+  ocpp_v: # ocpp 볼륨 선언
+
+# 배포
+# docker save -o offline offline-db offline-evc_was offline-ocpp offline-evc_webadmin redis offline-evc_errorreporter
+# docker save -o offline-evc_webadmin.tar offline-evc_webadmin
+# docker save -o offline-evc_was.tar offline-evc_was
+# docker load -i offline-was_web.tar
