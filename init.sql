@@ -205,6 +205,7 @@ CREATE TABLE IF NOT EXISTS `tENVMemberCard` (
   `inValid` varchar(1) DEFAULT 'N' COMMENT 'N:사용가능, Y:사용정지',
   `regdate` varchar(14) DEFAULT '' COMMENT '회원카드 등록 일시, YYYYMMDDHHMMSS',
   `upddate` varchar(14) DEFAULT '' COMMENT '회원카드 갱신 일시, YYYYMMDDHHMMSS',
+  `cardBalance` int(11) NOT NULL DEFAULT 0 COMMENT '-1:무제한, 0이상:잔액(원)',
   `updateTime` timestamp NOT NULL DEFAULT (current_timestamp() + interval 9 hour),
   PRIMARY KEY (`bid`,`cardNo`),
   KEY `idx_width_inValid` (`bid`,`cardNo`,`inValid`,`upddate`) USING BTREE
@@ -213,8 +214,8 @@ CREATE TABLE IF NOT EXISTS `tENVMemberCard` (
 -- 테이블 데이터 HelloCharger.tENVMemberCard:~0 rows (대략적) 내보내기
 DELETE FROM `tENVMemberCard`;
 /*!40000 ALTER TABLE `tENVMemberCard` DISABLE KEYS */;
-INSERT INTO `tENVMemberCard` (`bid`, `cardNo`, `inValid`, `regdate`, `upddate`, `updateTime`) VALUES
-	('LO', '4', 'N', '', '', '2025-04-29 11:53:38');
+INSERT INTO `tENVMemberCard` (`bid`, `cardNo`, `inValid`, `regdate`, `upddate`, `cardBalance`, `updateTime`) VALUES
+	('LO', '4', 'N', '', '', 0, '2025-04-29 11:53:38');
 /*!40000 ALTER TABLE `tENVMemberCard` ENABLE KEYS */;
 
 -- 테이블 HelloCharger.tENVMemberCard3 구조 내보내기
@@ -233,6 +234,29 @@ CREATE TABLE IF NOT EXISTS `tENVMemberCard3` (
 DELETE FROM `tENVMemberCard3`;
 /*!40000 ALTER TABLE `tENVMemberCard3` DISABLE KEYS */;
 /*!40000 ALTER TABLE `tENVMemberCard3` ENABLE KEYS */;
+
+-- 테이블 HelloCharger.tMonthlyChargeSettings 구조 내보내기
+CREATE TABLE IF NOT EXISTS `tMonthlyChargeSettings` (
+  `cardNo` varchar(16) NOT NULL COMMENT '회원카드번호',
+  `amount` int(11) NOT NULL DEFAULT 0 COMMENT '월별 충전금액 (덮어쓰기)',
+  `chargeDay` tinyint(2) NOT NULL DEFAULT 1 COMMENT '매월 충전일 (1-31)',
+  `chargeHour` tinyint(2) NOT NULL DEFAULT 0 COMMENT '충전 시각 (0-23, KST)',
+  `chargeMinute` tinyint(2) NOT NULL DEFAULT 0 COMMENT '충전 분 (0-59, KST)',
+  `enabled` varchar(1) NOT NULL DEFAULT 'Y' COMMENT 'Y:활성, N:비활성',
+  `updateTime` timestamp DEFAULT current_timestamp ON UPDATE current_timestamp,
+  PRIMARY KEY (`cardNo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 테이블 HelloCharger.tMonthlyChargeHistory 구조 내보내기
+CREATE TABLE IF NOT EXISTS `tMonthlyChargeHistory` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cardNo` varchar(16) NOT NULL COMMENT '회원카드번호',
+  `chargeDateTime` datetime NOT NULL COMMENT '충전 실행 일시 (KST)',
+  `amount` int(11) NOT NULL COMMENT '충전 금액 (덮어쓴 값)',
+  `prevBalance` int(11) DEFAULT NULL COMMENT '이전 잔액',
+  PRIMARY KEY (`id`),
+  KEY `idx_cardNo_chargeDateTime` (`cardNo`,`chargeDateTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 테이블 HelloCharger.tENVv2doRegiChargeHistory 구조 내보내기
 CREATE TABLE IF NOT EXISTS `tENVv2doRegiChargeHistory` (
