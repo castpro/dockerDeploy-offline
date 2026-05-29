@@ -11,6 +11,7 @@ cd /d C:\local-server\evc_webadmin
 git pull origin local-deploy
 
 cd /d C:\local-server\dockerDeploy-offline
+git pull origin main
 docker-compose down
 docker-compose up -d --build
 
