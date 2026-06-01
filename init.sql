@@ -425,7 +425,11 @@ DELETE FROM `tEVCChargerStatusHistory`;
 CREATE TABLE IF NOT EXISTS `tEVCChargerTransactionInfo` (
   `seqNo` int(11) NOT NULL AUTO_INCREMENT,
   `serialNumber` varchar(25) DEFAULT NULL,
+  `statId` varchar(8) DEFAULT '' COMMENT '충전소 ID',
+  `chargerId` varchar(2) DEFAULT '' COMMENT '충전기 ID',
   `cardNo` varchar(16) DEFAULT '' COMMENT '회원카드번호',
+  `bid` varchar(2) DEFAULT '' COMMENT '기관ID',
+  `payMethod` varchar(20) DEFAULT '' COMMENT '결제수단',
   `meterStart` int(10) DEFAULT 0 COMMENT '시작 meter',
   `reservationId` int(10) DEFAULT 0,
   `transactionId` int(11) DEFAULT 0 COMMENT 'central system이 생성',
@@ -439,9 +443,9 @@ CREATE TABLE IF NOT EXISTS `tEVCChargerTransactionInfo` (
 -- 테이블 데이터 HelloCharger.tEVCChargerTransactionInfo:~2 rows (대략적) 내보내기
 DELETE FROM `tEVCChargerTransactionInfo`;
 /*!40000 ALTER TABLE `tEVCChargerTransactionInfo` DISABLE KEYS */;
-INSERT INTO `tEVCChargerTransactionInfo` (`seqNo`, `serialNumber`, `cardNo`, `meterStart`, `reservationId`, `transactionId`, `timestamp`, `meterStop`, `reason`) VALUES
-	(260465, '11111101', '', 500, 0, 222222, now(), 0, ''),
-	(260466, '11111101', '', 0, 0, 222222, now(), 600, 'Local');
+INSERT INTO `tEVCChargerTransactionInfo` (`seqNo`, `serialNumber`, `statId`, `chargerId`, `cardNo`, `bid`, `payMethod`, `meterStart`, `reservationId`, `transactionId`, `timestamp`, `meterStop`, `reason`) VALUES
+	(260465, '11111101', '111111', '01', '', '', '', 500, 0, 222222, now(), 0, ''),
+	(260466, '11111101', '111111', '01', '', '', '', 0, 0, 222222, now(), 600, 'Local');
 /*!40000 ALTER TABLE `tEVCChargerTransactionInfo` ENABLE KEYS */;
 
 -- 테이블 HelloCharger.tEVCChargerTransactionInfo2 구조 내보내기
