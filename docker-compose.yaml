@@ -28,8 +28,6 @@ services:
     ports:
       - "3002:3002"
       - "3003:3003"
-    volumes:
-      - evc_was_v:/app/dist
     environment:
       - MYSQL_HOST=db
       - MYSQL_PORT=3306
@@ -61,8 +59,6 @@ services:
     restart: always  # 컨테이너가 종료되면 자동 재시작\
     ports:
       - "3000:3000"
-    volumes:
-      - ocpp_v:/app/dist
     networks:
       - app-network
     command: ["node","dist/bundle.js"]
@@ -123,9 +119,7 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_v: # db 볼륨 선언
-  evc_was_v: # evc_was 볼륨 선언
-  ocpp_v: # ocpp 볼륨 선언
+  mysql_v: # db 볼륨 선언 (데이터 유지)
 
 # 배포
 # docker save -o offline offline-db offline-evc_was offline-ocpp offline-evc_webadmin redis offline-evc_errorreporter
