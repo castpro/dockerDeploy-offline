@@ -1049,6 +1049,50 @@ DELETE FROM `tErrorReport2`;
 /*!40000 ALTER TABLE `tErrorReport2` DISABLE KEYS */;
 /*!40000 ALTER TABLE `tErrorReport2` ENABLE KEYS */;
 
+USE `HelloCharger`;
+
+-- 테이블 HelloCharger.daily_values 구조 내보내기 (대시보드 일별 충전통계)
+CREATE TABLE IF NOT EXISTS `daily_values` (
+  `id` varchar(36) NOT NULL,
+  `member_id` varchar(12) DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `cnt` int(11) DEFAULT 0,
+  `pow` bigint(20) DEFAULT 0,
+  `mon` bigint(20) DEFAULT 0,
+  `created_at` date DEFAULT NULL,
+  `updated_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_member_date` (`member_id`,`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='일별 충전통계 (updateDailyData cron)';
+
+-- 테이블 HelloCharger.monthly_values 구조 내보내기 (대시보드 월별 충전통계)
+CREATE TABLE IF NOT EXISTS `monthly_values` (
+  `id` varchar(36) NOT NULL,
+  `member_id` varchar(12) DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `cnt` int(11) DEFAULT 0,
+  `pow` bigint(20) DEFAULT 0,
+  `mon` bigint(20) DEFAULT 0,
+  `created_at` date DEFAULT NULL,
+  `updated_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_member_date` (`member_id`,`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='월별 충전통계 (updateMonthlyData cron)';
+
+-- 테이블 HelloCharger.tENVRegiChargeHistoryLog 구조 내보내기 (환경부 재등록 이력 로그)
+CREATE TABLE IF NOT EXISTS `tENVRegiChargeHistoryLog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `from_date` datetime DEFAULT NULL,
+  `total` int(11) DEFAULT 0,
+  `sent` int(11) DEFAULT 0,
+  `skip` int(11) DEFAULT 0,
+  `error` int(11) DEFAULT 0,
+  `error_detail` text DEFAULT NULL,
+  `trigger_type` varchar(10) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='환경부 충전이력 재등록 실행 로그';
+
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
