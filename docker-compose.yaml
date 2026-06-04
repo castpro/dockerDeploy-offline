@@ -39,7 +39,7 @@ services:
       # HDC 현대산업개발 단지서버 연동 설정
       # HDC 단지망이 없는 현장: HDC_ENABLED=false (기본값)
       # HDC 단지망이 있는 현장: HDC_ENABLED=true 로 변경 후 HDC_SERVER_URL 설정
-      - HDC_ENABLED=true
+      - HDC_ENABLED=false
       - HDC_SERVER_URL=http://192.168.0.100:8080
     networks:
       - app-network
