@@ -28,6 +28,7 @@ services:
     ports:
       - "3002:3002"
       - "3003:3003"
+      - "10004:10004"
     environment:
       - MYSQL_HOST=db
       - MYSQL_PORT=3306
@@ -40,7 +41,8 @@ services:
       # HDC 단지망이 없는 현장: HDC_ENABLED=false (기본값)
       # HDC 단지망이 있는 현장: HDC_ENABLED=true 로 변경 후 HDC_SERVER_URL 설정
       - HDC_ENABLED=true
-      - HDC_SERVER_URL=http://192.168.0.100:8080
+      - HDC_SERVER_URL=http://10.0.1.1:10000
+      - HDC_LOCAL_IP=10.0.210.1
     networks:
       - app-network
     command: ["node","dist/bundle.js"]
