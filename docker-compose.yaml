@@ -29,6 +29,8 @@ services:
       - "3002:3002"
       - "3003:3003"
       - "10004:10004"
+    volumes:
+      - ./was-manage:/app/dist/manage  # apk/log/config 파일 호스트에 영구 저장
     environment:
       - MYSQL_HOST=db
       - MYSQL_PORT=3306
@@ -37,6 +39,9 @@ services:
       - ERROR_SERVER_URL=evc_errorreporter:4001
       - HTTP_PORT=3002
       - HTTPS_PORT=3003
+      # S3 APK 목록/다운로드용 AWS 자격증명 (아래 두 줄에 본인 키 값 채워넣기)
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
       # HDC 현대산업개발 단지서버 연동 설정
       # HDC 단지망이 없는 현장: HDC_ENABLED=false (기본값)
       # HDC 단지망이 있는 현장: HDC_ENABLED=true 로 변경 후 HDC_SERVER_URL 설정
@@ -61,6 +66,7 @@ services:
     restart: always  # 컨테이너가 종료되면 자동 재시작\
     ports:
       - "3000:3000"
+      - "3004:3004"  # REST API (LOCAL_APP_UPDATE 등 원격제어 명령 수신)
     networks:
       - app-network
     command: ["node","dist/bundle.js"]
@@ -75,6 +81,7 @@ services:
         - REACT_APP_HOSTNAME_SOCKET=http://localhost:3000
         - REACT_APP_OCPP_HOSTNAME=http://localhost:3004
         - REACT_APP_ERROR_BACKEND=http://localhost:4001
+        - REACT_APP_APK_SERVER_IP=192.168.0.100  # 사업장마다 다르면 이 값만 바꿔서 재빌드
         - PORT=80
         - REACT_APP_INFRA=docker
         - REACT_APP_NETWORK=offline
