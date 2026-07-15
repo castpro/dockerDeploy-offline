@@ -81,7 +81,7 @@ services:
         - REACT_APP_HOSTNAME_SOCKET=http://localhost:3000
         - REACT_APP_OCPP_HOSTNAME=http://localhost:3004
         - REACT_APP_ERROR_BACKEND=http://localhost:4001
-        - REACT_APP_APK_SERVER_IP=192.168.0.100  # 사업장마다 다르면 이 값만 바꿔서 재빌드
+        - REACT_APP_APK_SERVER_IP=10.0.210.1  # 사업장마다 다르면 이 값만 바꿔서 재빌드 (충전기가 실제로 붙는 이더넷 2 IP)
         - PORT=80
         - REACT_APP_INFRA=docker
         - REACT_APP_NETWORK=offline
