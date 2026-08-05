@@ -39,9 +39,8 @@ services:
       - ERROR_SERVER_URL=evc_errorreporter:4001
       - HTTP_PORT=3002
       - HTTPS_PORT=3003
-      # S3 APK 목록/다운로드용 AWS 자격증명 (아래 두 줄에 본인 키 값 채워넣기)
-      - AWS_ACCESS_KEY_ID=
-      - AWS_SECRET_ACCESS_KEY=
+      # S3 APK 목록/다운로드용 AWS 자격증명 — 이제 관리자 페이지(리모트컨트롤)에서 입력해 settings.json에 저장.
+      # docker-compose.yaml에는 실제 키를 넣지 않는다 (배포 패키지에 키가 그대로 노출되는 문제 방지)
       # HDC 현대산업개발 단지서버 연동 설정
       # HDC 단지망이 없는 현장: HDC_ENABLED=false (기본값)
       # HDC 단지망이 있는 현장: HDC_ENABLED=true 로 변경 후 HDC_SERVER_URL 설정
